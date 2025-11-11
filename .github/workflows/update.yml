@@ -1,0 +1,53 @@
+name: update
+
+permissions:
+  contents: write
+
+on:
+  push:
+  schedule:
+    - cron:  '0 0 * * *'
+  pull_request:
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - name: Setup Git
+        run: |
+          git config user.name "ahaoboy-bot"
+          git config user.email "504595380@qq.com"
+
+      - uses: robinraju/release-downloader@v1
+        with:
+          repository: 'easy-install/easy-install'
+          tag: 'nightly'
+
+      - name: build
+        id: build
+        run: |
+          ls -lh .
+          bash ./download.sh
+
+      - name: release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: nightly
+          artifacts: "*.tar.gz"
+          allowUpdates: true
+
+      - name: Force push to main
+        run: |
+          git add .
+          git commit -m "update assets [skip ci]"
+          git branch -M main
+          git push -f origin main
