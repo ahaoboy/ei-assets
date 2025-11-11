@@ -57,16 +57,11 @@ compress_single() {
 
 
 # Post-process compressed files
-for file in *.zip *.gz; do
+for file in *.zip; do
     [ -e "$file" ] || continue
     process_compressed "$file"
 done
 
-# Compress single files
-for file in *.dat *.metadb *.mmdb; do
-    [ -e "$file" ] || continue
-    compress_single "$file"
-done
 
 echo "All downloads and processing completed."
 
